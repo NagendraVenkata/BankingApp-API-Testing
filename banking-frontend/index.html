@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Banking App</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <form id="login-form">
+    <input type="text" id="username" placeholder="Username" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <button type="submit">Login</button>
+  </form>
+
+  <h2 id="balance-section" style="display:none;">Balance: <span id="balance"></span></h2>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const balanceSection = document.getElementById('balance-section');
+    const balanceSpan = document.getElementById('balance');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('https://bankingapp-api-testing.onrender.com/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await response.json();
+
+      if (data.token) {
+        const balanceRes = await fetch('https://bankingapp-api-testing.onrender.com/balance', {
+          headers: { 'Authorization': data.token }
+        });
+
+        const balanceData = await balanceRes.json();
+        balanceSpan.textContent = balanceData.balance;
+        balanceSection.style.display = 'block';
+      } else {
+        alert('Login failed');
+      }
+    });
+  </script>
+</body>
+</html>
